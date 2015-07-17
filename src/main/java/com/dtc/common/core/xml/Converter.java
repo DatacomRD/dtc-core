@@ -10,15 +10,25 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import com.google.common.base.Preconditions;
+
 public class Converter {
+	private static final String NULL_CLASS_MSG = "Class 不能為 null";
+	private static final String NULL_VO_MSG = "value object 不能為 null";
+
 	private Converter() {}	//util class 遮掉 constructor
 	
 	public static <T extends IsXmlVO> T unmarshal(Class<T> clazz, String xml) throws JAXBException {
+		Preconditions.checkNotNull(xml, "xml 字串不能為 null");
+		
 		return unmarshal(clazz, new ByteArrayInputStream(xml.getBytes()));
 	}
 	
 	@SuppressWarnings("unchecked")
 	public static <T extends IsXmlVO> T unmarshal(Class<T> clazz, InputStream is) throws JAXBException {
+		Preconditions.checkNotNull(clazz, NULL_CLASS_MSG);
+		Preconditions.checkNotNull(is);
+
 		JAXBContext context = JAXBContext.newInstance(clazz);
 		Unmarshaller unmarshaller = context.createUnmarshaller();
 		T result = (T)unmarshaller.unmarshal(is);
@@ -32,6 +42,10 @@ public class Converter {
 	 * @param os  marshal 的結果會送進這個 {@link OutputStream}
 	 */
 	public static <T extends IsXmlVO> void marshal(Class<T> clazz, T vo, OutputStream os) throws JAXBException {
+		Preconditions.checkNotNull(clazz, NULL_CLASS_MSG);
+		Preconditions.checkNotNull(vo, NULL_VO_MSG);
+		Preconditions.checkNotNull(os, "OutputStream 不能為 null");
+		
 		JAXBContext context = JAXBContext.newInstance(clazz);
 		Marshaller marshaller = context.createMarshaller();
 		marshaller.marshal(vo, os);
@@ -43,6 +57,9 @@ public class Converter {
 	 * @return XML 字串
 	 */
 	public static <T extends IsXmlVO> String marshal(Class<T> clazz, T vo) throws JAXBException {
+		Preconditions.checkNotNull(clazz, NULL_CLASS_MSG);
+		Preconditions.checkNotNull(vo, NULL_VO_MSG);
+		
 		JAXBContext context = JAXBContext.newInstance(clazz);
 		Marshaller marshaller = context.createMarshaller();
 		StringWriter result = new StringWriter();
