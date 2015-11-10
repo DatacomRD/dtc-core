@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -18,10 +19,18 @@ public class Converter {
 
 	private Converter() {}	//util class 遮掉 constructor
 	
+	/**
+	 * 注意：這個 method 會強制以 UTF-8 處理 xml、而非 {@link Charset#defaultCharset()}，
+	 * 若要指定 charset，請使用 {@link #unmarshal(Class, String, Charset)}。 
+	 */
 	public static <T extends IsXmlVO> T unmarshal(Class<T> clazz, String xml) throws JAXBException {
+		return unmarshal(clazz, xml, Charset.forName("UTF-8"));
+	}
+	
+	public static <T extends IsXmlVO> T unmarshal(Class<T> clazz, String xml, Charset charset) throws JAXBException {
 		Preconditions.checkNotNull(xml, "xml 字串不能為 null");
 		
-		return unmarshal(clazz, new ByteArrayInputStream(xml.getBytes()));
+		return unmarshal(clazz, new ByteArrayInputStream(xml.getBytes(charset)));
 	}
 	
 	@SuppressWarnings("unchecked")
