@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -62,8 +64,29 @@ public class DoubleProperties {
 		if (outterFlag && outter.getProperty(key) != null) {
 			return outter.getProperty(key);
 		} else {
-			return outter.getProperty(key, defaultValue);
+			return inner.getProperty(key, defaultValue);
 		}
+	}
+
+	/**
+	 * 將指定的 property 以行為單位、過濾空白行、並刪除行首行尾的空白，
+	 * 並轉為 String 的 List。
+	 */
+	protected List<String> getPropertyList(String key) {
+		ArrayList<String> result = new ArrayList<>();
+		String property = getProperty(key);
+
+		if (property == null) { return result; }
+
+		for (String line : property.split("\n")) {
+			String clean = line.trim();
+
+			if (clean.isEmpty()) { continue; }
+
+			result.add(clean);
+		}
+
+		return result;
 	}
 
 	private InputStream getResourceStream(String name) {
